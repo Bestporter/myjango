@@ -1,3 +1,6 @@
+FAQ :  https://docs.djangoproject.com/zh-hans/3.1/faq/help/#i-think-i-ve-found-a-security-problem-what-should-i-do
+
+
 Django 如何知道 {% url %} 标签到底对应哪一个应用的 URL 呢？
 答案是：在根 URLconf 中添加命名空间。在 polls/urls.py 文件中稍作修改，加上 app_name 设置命名空间：
 
