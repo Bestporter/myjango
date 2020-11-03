@@ -2,6 +2,8 @@ from django.http import Http404
 from django.shortcuts import render
 
 # Create your views here.
+from django.shortcuts import render,HttpResponse,redirect
+from django.views import View
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
@@ -10,6 +12,27 @@ from django.urls import reverse
 from .models import Question, Choice
 from django.views import generic
 from django.utils import timezone
+from django.shortcuts import render
+
+
+def test(request):
+    # 传给模板的变量值可以是任意python类型，如下
+    msg='hello world'
+    dic={'k1':1,'k2':2}
+    class Person(object):
+        def __init__(self,name,age):
+            self.name=name
+            self.age=age
+
+    obj=Person('egon',18)
+    li = [1,'aaa',obj]
+
+    return render(request,'test.html',{'msg':msg,'dic':dic,'obj':obj,'li':li})
+    # 注意：
+    # 1、render函数的第三个参数包含了要传给模板的变量值，是一个字典类型，该字典中的key必须与模板文件中的变量名相对应，render函数会去templates目录下找到模板文件，然后根据字典中的key对应到模板文件中的变量名进行赋值操作，最后将赋值后的模板文件内容返回给浏览器
+    # 2、可以将render函数的第三个参数简写为locals(),如下
+    return render(request,'test.html',locals()) #locals()会将函数test内定义的名字与值转换为字典中的k与v
+
 
 '''我们在这里使用两个通用视图： ListView 和 DetailView 。
 这两个视图分别抽象“显示一个对象列表”和“显示一个特定类型对象的详细信息页面”这两种概念。'''
@@ -69,6 +92,25 @@ def vote(request, question_id):
         return HttpResponseRedirect(reverse('polls:results', args=(question.id,)))
 
 
+class LoginView(View):
+    def dispatch(self, request, *args, **kwargs): # 可在该方法内做一些预处理操作
+        # 当请求url为：http://127.0.0.1:8008/login/会先触发dispatch的执行
+        # 如果http协议的请求方法为GET，则调用下述get方法
+        # 如果http协议的请求方法为POST，则调用下述post方法
+        obj=super().dispatch(request, *args, **kwargs) # 必须继承父类的dispatch功能
+        return obj # 必须返回obj
+
+    def get(self,request):
+        return render(request,'login.html')
+
+    def post(self,request):
+        name=request.POST.get('name')
+        pwd=request.POST.get('pwd')
+        if name  == 'egon' and pwd == '123':
+            res='登录成功'
+        else:
+            res='用户名或密码错误'
+        return HttpResponse(res)
 '''
 def index(request):
 
